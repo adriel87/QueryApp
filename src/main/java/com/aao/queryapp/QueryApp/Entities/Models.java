@@ -27,7 +27,10 @@ public class Models {
     private String name;
 
     private String modelJoinColum;
-
+    
+    @OneToMany(mappedBy = "id", targetEntity = Models.class)
+    private Collection<ColumnName> columns;
+    
     @Column(length = 15, nullable = true, unique = true)
     private String alias;
 
@@ -36,6 +39,7 @@ public class Models {
 
     @OneToMany(mappedBy = "joinModel")
     private Collection<Models> children;
+
 
     @Column(nullable = false)
     private String targetJoinColumn;
