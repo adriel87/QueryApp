@@ -50,10 +50,10 @@ public class ModelsController {
                 childModels.add(childModel.get());
                 
                 Query query = new Query(present, childModels);
-                // String query = createQuery(present, childModels);
                 return query.createQuery();
             }else{
-                return selectPhase(present);
+                Query query = new Query(present);
+                return query.createQuery();
             }
         }
         return "query.toString()";
@@ -61,7 +61,6 @@ public class ModelsController {
 
     @PostMapping("add")
     public ResponseEntity<Boolean> postMethodName(@RequestBody ModelRequestDTO modelRequestDTO) {
-        //TODO: process POST request
         Models model;
         if (modelRequestDTO.getOptionalModelId().isPresent()) {
             Integer id = modelRequestDTO.getOptionalModelId().get();
@@ -91,94 +90,4 @@ public class ModelsController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private String selectPhase(Models model){
-
-        StringBuilder select = new StringBuilder();
-        String whiteSpace = " ";
-        String carryReturn = "\n";
-        String alias = model.getAlias();
-        String baseModel = model.getName();
-        select
-        .append("SELECT * FROM")
-        .append(whiteSpace)
-        .append(baseModel);
-
-        if (alias != null) {
-            select
-            .append(whiteSpace)
-            .append(alias);
-        }
-
-        select.append(carryReturn);
-
-        return select.toString();
-    }
-
-    private String joinPhase(Models parentModel, Models chilModel){
-        StringBuilder join = new StringBuilder();
-        String JOIN = "JOIN";
-        String ON = "ON";
-        String equalTo = "=";
-        String point = ".";
-        String whiteSpace = " ";
-
-        String childModelName = chilModel.getName();
-        String childModelAlias = chilModel.getAlias();
-        String childModelColumnToJoin = chilModel.getModelJoinColum();
-
-        String parentModelAlias = parentModel.getAlias();
-        String parentColumnToJoin = parentModel.getTargetJoinColumn();
-
-        join
-            .append(JOIN)
-            .append(whiteSpace)
-            .append(childModelName)
-            .append(whiteSpace)
-            .append(childModelAlias)
-            .append(whiteSpace)
-            .append(ON)
-            .append(whiteSpace)
-            .append(childModelAlias)
-            .append(point)
-            .append(childModelColumnToJoin)
-            .append(whiteSpace)
-            .append(equalTo)
-            .append(whiteSpace)
-            .append(parentModelAlias)
-            .append(point)
-            .append(parentColumnToJoin);
-
-        return join.toString();
-    }
-
-    private String createQuery(Models parentModel, ArrayList<Models> joinModels){
-        StringBuilder query = new StringBuilder();
-        String carryReturn = "\n";
-        String closeQuery = ";";
-        query
-            .append(selectPhase(parentModel))
-            .append(carryReturn);
-
-        joinModels.forEach(joinModel -> {
-            query.append(joinPhase(parentModel, joinModel));
-        });
-        
-        query
-            .append(closeQuery);
-        
-        return query.toString();
-    }
-    
-    private String createQuery(Models parentModel){
-        StringBuilder query = new StringBuilder();
-        String closeQuery = ";";
-        query
-            .append(selectPhase(parentModel))
-            .append(closeQuery);
-        
-        return query.toString();
-    }
-    
-    
-    
 }
