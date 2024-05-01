@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
@@ -36,7 +35,6 @@ public class Models {
     private Models joinModel;
 
     @OneToMany(mappedBy = "joinModel")
-    // @JoinColumn(nullable = true, name = "join_model_id")
     private Collection<Models> children;
 
     @Column(nullable = false)
