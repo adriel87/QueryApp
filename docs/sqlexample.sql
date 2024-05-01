@@ -15,4 +15,4 @@ First use case:
 select * from base b
 
 -- Join Phase
-join mando m on base.id = mando.base_id>
+join mando m on b.id = m.base_id
