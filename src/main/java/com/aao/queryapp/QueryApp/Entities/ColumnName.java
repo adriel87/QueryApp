@@ -7,38 +7,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Models {
-    
+public class ColumnName {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(length = 50, nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
-    private String modelJoinColum;
-    
-    @OneToMany(mappedBy = "models", fetch = FetchType.EAGER)
-    private Set<ColumnName> columns;
-    
-    @Column(length = 15, unique = true)
-    private String alias;
-
-    @ManyToOne
-    @JoinColumn(name = "models_id")
-    private Models models;
-
-    @OneToMany(mappedBy = "models",fetch = FetchType.LAZY)
-    private Set<Models> children;
-
-
     @Column(nullable = false)
-    private String targetJoinColumn;
+    private String type;
+
+    @ManyToOne()
+    @JoinColumn(name = "models_id", nullable = false)
+    private Models models;
 }

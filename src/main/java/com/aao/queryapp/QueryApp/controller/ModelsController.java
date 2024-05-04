@@ -1,23 +1,21 @@
 package com.aao.queryapp.QueryApp.controller;
 
-import org.springframework.web.bind.annotation.RestController;
-
+import com.aao.queryapp.QueryApp.Entities.ColumnName;
 import com.aao.queryapp.QueryApp.Entities.Models;
+import com.aao.queryapp.QueryApp.dto.request.AddColumnRequestDTO;
 import com.aao.queryapp.QueryApp.dto.request.ModelRequestDTO;
+import com.aao.queryapp.QueryApp.dto.request.ModelResponseDTO;
+import com.aao.queryapp.QueryApp.repository.ColumnNameRepository;
 import com.aao.queryapp.QueryApp.repository.ModelsRepository;
 import com.aao.queryapp.QueryApp.services.query.Query;
-
-import java.util.*;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Optional;
 
 
 @RestController
@@ -27,31 +25,61 @@ public class ModelsController {
     @Autowired
     ModelsRepository modelsRepository;
 
+    @Autowired
+    ColumnNameRepository columnNameRepository;
 
     @GetMapping("list")
     public Iterable<Models> getMethodName() {
         return modelsRepository.findAll();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getModelById(@PathVariable(name = "id") int id) {
+        Optional<Models> models = modelsRepository.findById(id);
+        ModelResponseDTO modelResponseDTO = new ModelResponseDTO();
+        modelResponseDTO.setChildrensID(new HashSet<>());
+
+        if (models.isPresent()) {
+            Models models2 = models.get();
+            modelResponseDTO.setId(models2.getId().toString());
+            modelResponseDTO.setAlias(models2.getAlias());
+
+            if (!models2.getColumns().isEmpty()) {
+                modelResponseDTO.setColumns(new HashSet<>());
+                models2.getColumns().iterator().forEachRemaining(column -> modelResponseDTO.getColumns().add(column));
+            }
+            modelResponseDTO.setColumns(models2.getColumns());
+            modelResponseDTO.setModelJoinColumn(models2.getModelJoinColum());
+            if (models2.getModels() != null) {
+                modelResponseDTO.setModelsID(models2.getModels().getId().toString());
+            }
+            modelResponseDTO.setName(models2.getName());
+            models2.getChildren().iterator().forEachRemaining(child -> modelResponseDTO.getChildrensID().add(child.getId()));
+            return new ResponseEntity<>(models2, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
     @GetMapping("query")
     public String getQueryString(
-        @RequestParam("parentModelId") int parentModelId, 
-        @RequestParam("childModelId") int childModelId
+            @RequestParam("parentModelId") int parentModelId,
+            @RequestParam("childModelId") int childModelId
     ) {
 
         Optional<Models> parentModel = modelsRepository.findById(parentModelId);
         Optional<Models> childModel = modelsRepository.findById(childModelId);
 
-        ArrayList<Models> childModels = new ArrayList();
-        
+        ArrayList<Models> childModels = new ArrayList<>();
+
         if (parentModel.isPresent()) {
             Models present = parentModel.get();
             if (childModel.isPresent()) {
                 childModels.add(childModel.get());
-                
+
                 Query query = new Query(present, childModels);
                 return query.createQuery();
-            }else{
+            } else {
                 Query query = new Query(present);
                 return query.createQuery();
             }
@@ -71,7 +99,7 @@ public class ModelsController {
                 model.setModelJoinColum(modelRequestDTO.getModelNameJoinColum());
                 model.setName(modelRequestDTO.getName());
                 model.setTargetJoinColumn(modelRequestDTO.getTargetJoinColumn());
-                model.setJoinModel(join.get());
+                model.setModels(join.get());
                 modelsRepository.save(model);
                 return new ResponseEntity<>(HttpStatus.OK);
             } else {
@@ -86,8 +114,30 @@ public class ModelsController {
             modelsRepository.save(model);
         }
 
-       
+
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/add/column")
+    public ResponseEntity<?> addColumn(@RequestBody AddColumnRequestDTO addColumnRequestDTO) {
+
+        ColumnName newColumnName = new ColumnName();
+
+
+            Optional<Models> models = modelsRepository.findById(addColumnRequestDTO.getModelId());
+
+            if (models.isPresent()) {
+
+                newColumnName.setType(addColumnRequestDTO.getType());
+                newColumnName.setName(addColumnRequestDTO.getName());
+                newColumnName.setModels(models.get());
+                ColumnName insertedColumnName = columnNameRepository.save(newColumnName);
+
+                return new ResponseEntity<>(insertedColumnName,HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
     }
 
 }
