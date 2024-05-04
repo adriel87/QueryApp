@@ -1,11 +1,8 @@
 package com.aao.queryapp.QueryApp.Entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class ColumnName {
 
     @Id
@@ -26,6 +24,7 @@ public class ColumnName {
     @Column(nullable = false)
     private String type;
 
-    @ManyToOne
-    private Models model;
+    @ManyToOne()
+    @JoinColumn(name = "models_id", nullable = false)
+    private Models models;
 }

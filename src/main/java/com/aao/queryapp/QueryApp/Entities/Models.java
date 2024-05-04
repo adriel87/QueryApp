@@ -1,22 +1,19 @@
 package com.aao.queryapp.QueryApp.Entities;
 
-import java.util.Collection;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Models {
     
     @Id
@@ -28,17 +25,18 @@ public class Models {
 
     private String modelJoinColum;
     
-    @OneToMany(mappedBy = "id", targetEntity = Models.class)
-    private Collection<ColumnName> columns;
+    @OneToMany(mappedBy = "models", fetch = FetchType.EAGER)
+    private Set<ColumnName> columns;
     
-    @Column(length = 15, nullable = true, unique = true)
+    @Column(length = 15, unique = true)
     private String alias;
 
     @ManyToOne
-    private Models joinModel;
+    @JoinColumn(name = "models_id")
+    private Models models;
 
-    @OneToMany(mappedBy = "joinModel")
-    private Collection<Models> children;
+    @OneToMany(mappedBy = "models",fetch = FetchType.LAZY)
+    private Set<Models> children;
 
 
     @Column(nullable = false)
