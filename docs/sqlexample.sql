@@ -14,5 +14,22 @@ First use case:
 -- Select Phase
 select * from base b
 
+-- Select Phase selecting columns name
+
+select
+    b.name,
+    b.age
+
+from base b
+
+-- SelectPhase selecting column name whit join
+
+select
+    b.name,
+    b.age,
+    m.name
+from base b
+join mando m on b.id = m.base_id
+
 -- Join Phase
 join mando m on b.id = m.base_id

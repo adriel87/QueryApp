@@ -6,17 +6,14 @@ import com.aao.queryapp.QueryApp.Entities.Models;
 public class Query implements QueryI {
 
 
+    private final ShareSqlCharacter shareSqlCharacter = new ShareSqlCharacter();
     private StringBuilder query = new StringBuilder();
     private Models parentModel;
     private ArrayList<Models> childrenModels;
     private String SELECT_FROM = "SELECT * FROM";
-    private String carryReturn = "\n";
-    private String closeQuery = ";"; 
     private String JOIN = "JOIN";
     private String ON = "ON";
     private String equalTo = "=";
-    private String point = ".";
-    private String whiteSpace = " ";
 
     public Query(Models parentModel){
         this.parentModel = parentModel;
@@ -37,7 +34,7 @@ public class Query implements QueryI {
 
         return query
                 .append(selectPhase(parentModel))
-                .append(closeQuery)
+                .append(shareSqlCharacter.closeQuery)
                 .toString();
     }
 
@@ -45,7 +42,7 @@ public class Query implements QueryI {
     public String createQuery(Models parentModel) {
         return query
                 .append(selectPhase(parentModel))
-                .append(closeQuery)
+                .append(shareSqlCharacter.closeQuery)
                 .toString();
     }
 
@@ -53,14 +50,14 @@ public class Query implements QueryI {
     public String createQuery(Models parentModel, Collection<Models> childrenModels) {
         query
             .append(selectPhase(parentModel))
-            .append(carryReturn);
+            .append(shareSqlCharacter.carryReturn);
 
         childrenModels.forEach(joinModel -> {
             query.append(joinPhase(parentModel, joinModel));
         });
 
         query
-            .append(closeQuery);
+            .append(shareSqlCharacter.closeQuery);
 
         return query.toString();
     }
@@ -74,16 +71,16 @@ public class Query implements QueryI {
 
         select
             .append(SELECT_FROM)
-            .append(whiteSpace)
+            .append(shareSqlCharacter.whiteSpace)
             .append(baseModel);
 
         if (alias != null) {
             select
-            .append(whiteSpace)
+            .append(shareSqlCharacter.whiteSpace)
             .append(alias);
         }
 
-        select.append(carryReturn);
+        select.append(shareSqlCharacter.carryReturn);
 
         return select.toString();
     }
@@ -100,21 +97,21 @@ public class Query implements QueryI {
 
         join
             .append(JOIN)
-            .append(whiteSpace)
+            .append(shareSqlCharacter.whiteSpace)
             .append(childModelName)
-            .append(whiteSpace)
+            .append(shareSqlCharacter.whiteSpace)
             .append(childModelAlias)
-            .append(whiteSpace)
+            .append(shareSqlCharacter.whiteSpace)
             .append(ON)
-            .append(whiteSpace)
+            .append(shareSqlCharacter.whiteSpace)
             .append(childModelAlias)
-            .append(point)
+            .append(shareSqlCharacter.point)
             .append(childModelColumnToJoin)
-            .append(whiteSpace)
+            .append(shareSqlCharacter.whiteSpace)
             .append(equalTo)
-            .append(whiteSpace)
+            .append(shareSqlCharacter.whiteSpace)
             .append(parentModelAlias)
-            .append(point)
+            .append(shareSqlCharacter.point)
             .append(parentColumnToJoin);
 
         return join.toString();
