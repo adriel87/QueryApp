@@ -28,11 +28,6 @@ public class SelectPhase implements Phase {
         this.parentModel = parentModel;
     }
 
-    public SelectPhase(Models parentModel, Set<Models> childrenModels) {
-        this.parentModel = parentModel;
-        this.childrenModels = childrenModels;
-    }
-
     public SelectPhase(Models parentModel, Set<Models> childrenModels, Set<ColumnName> columns) {
         this.parentModel = parentModel;
         this.childrenModels = childrenModels;
@@ -46,6 +41,7 @@ public class SelectPhase implements Phase {
                 .append(character.whiteSpace)
                 .toString();
     }
+
     public String selectAddColumns() {
         StringBuilder columnsPhaseString = new StringBuilder();
         if (hasColumns()) {
@@ -77,8 +73,8 @@ public class SelectPhase implements Phase {
     private String selectAfterColumns() {
         String alias = parentModel.getAlias();
         String baseModel = parentModel.getName();
-        StringBuilder selecAfterColumns = new StringBuilder();
-        return selecAfterColumns
+        StringBuilder selectAfterColumns = new StringBuilder();
+        return selectAfterColumns
                 .append(character.whiteSpace)
                 .append(FROM)
                 .append(character.whiteSpace)
@@ -89,7 +85,7 @@ public class SelectPhase implements Phase {
     }
 
     private String selectEnd() {
-        return hasChildren() ? character.carryReturn : character.closeQuery;
+        return hasChildren() ? character.carryReturn : character.whiteSpace;
     }
 
     private boolean hasChildren() {

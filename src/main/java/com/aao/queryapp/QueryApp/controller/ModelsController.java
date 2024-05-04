@@ -7,7 +7,9 @@ import com.aao.queryapp.QueryApp.dto.request.ModelRequestDTO;
 import com.aao.queryapp.QueryApp.dto.request.ModelResponseDTO;
 import com.aao.queryapp.QueryApp.repository.ColumnNameRepository;
 import com.aao.queryapp.QueryApp.repository.ModelsRepository;
+import com.aao.queryapp.QueryApp.services.query.JoinPhase;
 import com.aao.queryapp.QueryApp.services.query.Query;
+import com.aao.queryapp.QueryApp.services.query.SelectPhase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,18 +71,32 @@ public class ModelsController {
 
         Optional<Models> parentModel = modelsRepository.findById(parentModelId);
         Optional<Models> childModel = modelsRepository.findById(childModelId);
+        Optional<ColumnName> optionalColumnName = columnNameRepository.findById(1);
 
         ArrayList<Models> childModels = new ArrayList<>();
 
+
         if (parentModel.isPresent()) {
-            Models present = parentModel.get();
+            Models presentParent = parentModel.get();
+            SelectPhase selectPhase;
+
+
             if (childModel.isPresent()) {
                 childModels.add(childModel.get());
+                HashSet<Models> presentChildrens = new HashSet<>();
+                HashSet<ColumnName> columns = new HashSet<>();
+                columns.add(optionalColumnName.get());
+                presentChildrens.add(childModel.get());
 
-                Query query = new Query(present, childModels);
+                selectPhase = new SelectPhase(presentParent, presentChildrens, columns);
+                JoinPhase joinPhase = new JoinPhase(presentChildrens);
+                Query query = new Query(selectPhase, joinPhase);
+
                 return query.createQuery();
+
             } else {
-                Query query = new Query(present);
+                selectPhase = new SelectPhase(presentParent);
+                Query query = new Query(selectPhase);
                 return query.createQuery();
             }
         }
@@ -124,19 +140,19 @@ public class ModelsController {
         ColumnName newColumnName = new ColumnName();
 
 
-            Optional<Models> models = modelsRepository.findById(addColumnRequestDTO.getModelId());
+        Optional<Models> models = modelsRepository.findById(addColumnRequestDTO.getModelId());
 
-            if (models.isPresent()) {
+        if (models.isPresent()) {
 
-                newColumnName.setType(addColumnRequestDTO.getType());
-                newColumnName.setName(addColumnRequestDTO.getName());
-                newColumnName.setModels(models.get());
-                ColumnName insertedColumnName = columnNameRepository.save(newColumnName);
+            newColumnName.setType(addColumnRequestDTO.getType());
+            newColumnName.setName(addColumnRequestDTO.getName());
+            newColumnName.setModels(models.get());
+            ColumnName insertedColumnName = columnNameRepository.save(newColumnName);
 
-                return new ResponseEntity<>(insertedColumnName,HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
+            return new ResponseEntity<>(insertedColumnName, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
     }
 
