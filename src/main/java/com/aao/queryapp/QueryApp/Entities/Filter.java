@@ -18,6 +18,8 @@ public class Filter {
 
     private String name;
 
+    private String operator;
+
     @OneToMany(mappedBy = "filter")
     private Collection<ColumnType> columnTypes;
 
