@@ -27,4 +27,8 @@ public class ColumnName {
     @ManyToOne()
     @JoinColumn(name = "models_id", nullable = false)
     private Models models;
+
+    @ManyToOne
+    @JoinColumn(name = "columntype_id", nullable = false)
+    private ColumnType columnType;
 }
