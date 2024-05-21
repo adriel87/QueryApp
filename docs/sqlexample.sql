@@ -42,3 +42,16 @@ SelectPhase
 where 
     base_alias.columnSelected <predicado>
 
+
+-- 1 predicado 
+
+valor_de_la_columna operador valor_a_comparar
+
+-- mas de un predicado
+
+valor_de_la_columna operador valor_a_comparar_1
+
+AND/OR 
+
+valor_de_la_columna operador valor_a_comparar_2
+

@@ -5,6 +5,7 @@ import com.aao.queryapp.QueryApp.Entities.Models;
 import com.aao.queryapp.QueryApp.dto.request.AddColumnRequestDTO;
 import com.aao.queryapp.QueryApp.dto.request.ModelRequestDTO;
 import com.aao.queryapp.QueryApp.dto.request.ModelResponseDTO;
+import com.aao.queryapp.QueryApp.dto.response.ModelsResponseDTO;
 import com.aao.queryapp.QueryApp.repository.ColumnNameRepository;
 import com.aao.queryapp.QueryApp.repository.ModelsRepository;
 import com.aao.queryapp.QueryApp.services.query.JoinPhase;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 
@@ -31,8 +33,16 @@ public class ModelsController {
     ColumnNameRepository columnNameRepository;
 
     @GetMapping("list")
-    public Iterable<Models> getMethodName() {
-        return modelsRepository.findAll();
+    public ResponseEntity<Collection<ModelsResponseDTO>> getMethodName() {
+        Iterable<Models> models = modelsRepository.findAll();
+        ArrayList<ModelsResponseDTO> modelsList = new ArrayList<>();
+        models.iterator().forEachRemaining(m -> {
+            ModelsResponseDTO modelsResponseDTO = new ModelsResponseDTO();
+            modelsResponseDTO.setName(m.getName());
+            modelsList.add(modelsResponseDTO);
+        });
+
+        return new ResponseEntity<>(modelsList,HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
